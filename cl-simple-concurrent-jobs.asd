@@ -1,5 +1,5 @@
 (asdf:defsystem :cl-simple-concurrent-jobs
-  :version "0.1"
+  :version "0.2"
   :license "BSD 2-Clause"
   :author "Jordan Rhys Powell"
   :description "A simple API for running concurrent jobs"
