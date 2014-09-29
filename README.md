@@ -55,6 +55,7 @@ That returned value of 1 is the number of total jobs the executor think it's sup
 
 Excellent. What about these 4 threads though?
 
+    > (setf *je* (cl-scj:create-job-executor :num-threads 4))
     > (dotimes (x 20) (cl-scj:add-job *je* (make-job (+ 1 x))))
     Starting very important job number 1
     Starting very important job number 2
@@ -62,9 +63,9 @@ Excellent. What about these 4 threads though?
     Starting very important job number 4
     NIL
     Finished very important job number Finished very important job number 21
-    
+
     Job Job 21 returning result  returning result 11//15000
-    
+
     Starting very important job number 5
     Starting very important job number 6
     Finished very important job number 4
@@ -85,7 +86,7 @@ The last thing to consider is how to stop the jobs (if you want to). First kick 
 
     > (dotimes (x 1000) (cl-scj:add-job *je* (make-job x)))
     Starting very important job number Starting very important job number 01
-    
+
     Starting very important job number 2
     Starting very important job number 3
     NIL
@@ -109,6 +110,7 @@ Finally, if you want to check if the results are available in a non-blocking-way
 Some miscellaneous notes:
 * An error is a valid form of completion as far as this is concerned, so don't believe that there were no errors in your callables just because `join-results` returns immediately
 * An error puts a `nil` in results
+* You can't call `join-results` more than once on a `JobExecutor` - it calls `stop`
 * I don't know if the API is thread-safe
 * There is more README than code
 
@@ -124,7 +126,7 @@ I'm not sure. I wrote it because I couldn't find something with such a simple AP
 Is it safe? Will it work for me?
 ================================
 
-Maybe. It's working for me so far. 
+Maybe. It's working for me so far.
 
 
 The Latest Version

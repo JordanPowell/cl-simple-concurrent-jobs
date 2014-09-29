@@ -23,8 +23,10 @@
 (defgeneric append-result (JobExecutor result))
 (defgeneric create-job-for-executor (JobExecutor))
 (defgeneric add-job (JobExecutor callable))
-(defgeneric join-results (JobExecutor))
+(defgeneric cleanup-threads (JobExecutor))
 (defgeneric stop (JobExecutor))
+(defgeneric finish-and-return-results (JobExecutor))
+(defgeneric join-results (JobExecutor))
 
 (defmethod has-all-results ((je JobExecutor))
   (with-job-executor-lock (je)
@@ -39,12 +41,16 @@
 
 (defmethod create-job-for-executor ((je JobExecutor))
   (chanl:pexec ()
+    (format t "Waiting ~%")
     (loop while (should-run je)
        do (let ((result nil))
 	    ;; this is awful, but the way we block on jobs completing
 	    ;; requires something like this. Any better ideas?
-	    (unwind-protect (setf result (funcall (chanl:recv (channel je))))
-	      (append-result je result))))))
+	    (unwind-protect (let ((function-or-quit (chanl:recv (channel je))))
+			      (when (functionp function-or-quit)
+				(setf result (funcall function-or-quit))))
+	      (append-result je result))))
+    (format t "And done~%")))
 
 (defmethod add-job ((je JobExecutor) callable)
   (with-job-executor-lock (je)
@@ -52,18 +58,27 @@
     (chanl:send (channel je) callable)
     (num-expected-results je)))
 
+(defmethod cleanup-threads ((je JobExecutor))
+  (dotimes (x (num-threads je))
+    (add-job je nil)))
+
+(defmethod stop ((je JobExecutor))
+  (setf (should-run je) nil)
+  (cleanup-threads je)
+  (bt:condition-notify (completion-condition je)))
+
+(defmethod finish-and-return-results ((je JobExecutor))
+  (stop je)
+  (results je))
+
 (defmethod join-results ((je JobExecutor))
   (with-job-executor-lock (je)
     (if (or (not (should-run je))
 	    (has-all-results je))
-	(results je)
+	(finish-and-return-results je)
 	(progn
 	  (bt:condition-wait (completion-condition je) (je-lock je))
-	  (results je)))))
-
-(defmethod stop ((je JobExecutor))
-  (setf (should-run je) nil)
-  (bt:condition-notify (completion-condition je)))
+	  (finish-and-return-results je)))))
 
 (defmethod initialize-instance :after ((je JobExecutor) &key)
   (setf (chanl-tasks je)
