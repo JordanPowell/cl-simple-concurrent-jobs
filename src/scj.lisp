@@ -41,7 +41,6 @@
 
 (defmethod create-job-for-executor ((je JobExecutor))
   (chanl:pexec ()
-    (format t "Waiting ~%")
     (loop while (should-run je)
        do (let ((result nil))
 	    ;; this is awful, but the way we block on jobs completing
@@ -49,8 +48,7 @@
 	    (unwind-protect (let ((function-or-quit (chanl:recv (channel je))))
 			      (when (functionp function-or-quit)
 				(setf result (funcall function-or-quit))))
-	      (append-result je result))))
-    (format t "And done~%")))
+	      (append-result je result))))))
 
 (defmethod add-job ((je JobExecutor) callable)
   (with-job-executor-lock (je)
