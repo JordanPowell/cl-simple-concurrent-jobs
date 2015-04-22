@@ -2,7 +2,7 @@
   :version "0.2"
   :license "BSD 2-Clause"
   :author "Jordan Rhys Powell"
-  :description "A simple API for running concurrent jobs"
+  :description "A simple API for running concurrent jobs and collecting the results"
   :serial t
   :depends-on (#:bordeaux-threads #:chanl)
   :components ((:module src
