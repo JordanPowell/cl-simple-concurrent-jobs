@@ -1,4 +1,4 @@
-(defpackage #:cl-simple-concurent-jobs
+(defpackage #:cl-simple-concurrent-jobs
   (:documentation
    "A simple API for running concurrent jobs")
   (:use #:cl)

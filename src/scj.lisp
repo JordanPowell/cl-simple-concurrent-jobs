@@ -1,4 +1,4 @@
-(in-package #:cl-simple-concurent-jobs)
+(in-package #:cl-simple-concurrent-jobs)
 
 (defmacro with-job-executor-lock ((worker) &body body)
   (let ((je (gensym)))
