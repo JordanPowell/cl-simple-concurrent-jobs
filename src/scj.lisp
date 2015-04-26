@@ -28,7 +28,7 @@
     (when (has-all-results je)
       (bt:condition-notify (completion-condition je)))))
 
-(defun create-job-for-executor (je)
+(defun create-job-worker (je)
   (chanl:pexec ()
     (loop while (should-run je)
        do (let ((result nil))
@@ -69,8 +69,8 @@
 
 (defmethod initialize-instance :after ((je JobExecutor) &key)
   (setf (chanl-tasks je)
-	(loop for i from 0 to (- (num-threads je) 1) collect
-	     (create-job-for-executor je))))
+	(loop for i from 1 to (num-threads je) collect
+	     (create-job-worker je))))
 
 (defun create-job-executor (&key (num-threads 8))
   (make-instance 'JobExecutor :num-threads num-threads))
