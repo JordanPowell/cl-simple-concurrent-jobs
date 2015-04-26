@@ -132,7 +132,7 @@ Maybe. It's working for me so far.
 The Latest Version
 ==================
 
-To the extent that I'm using versioning, this is version `0.3`. If I ever need to create another version, I promise to follow [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html).
+To the extent that I'm using versioning, this is version `1.0.0`. If I ever need to create another version, I promise to follow [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html).
 
 
 Installation
