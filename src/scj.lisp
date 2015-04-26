@@ -1,10 +1,8 @@
 (in-package #:cl-simple-concurrent-jobs)
 
 (defmacro with-job-executor-lock ((worker) &body body)
-  (let ((je (gensym)))
-    `(let ((,je ,worker))
-       (bt:with-recursive-lock-held ((je-lock ,je))
-	 ,@body))))
+  `(bt:with-recursive-lock-held ((je-lock ,worker))
+     ,@body))
 
 (defclass JobExecutor ()
   ((num-threads :initarg :num-threads :reader num-threads)
