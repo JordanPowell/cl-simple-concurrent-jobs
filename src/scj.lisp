@@ -8,7 +8,7 @@
   ((num-threads :initarg :num-threads :reader num-threads)
    (chanl-tasks :accessor chanl-tasks)
    (results :accessor results :initform nil)
-   (num-expected-results :accessor num-expected-results :initform 0)
+   (num-results-expected :accessor num-results-expected :initform 0)
    (num-results-got :accessor num-results-got :initform 0)
    (completion-condition :initform (bt:make-condition-variable)
 			 :reader completion-condition)
@@ -19,7 +19,7 @@
 
 (defun has-all-results (je)
   (with-job-executor-lock (je)
-    (eql (num-expected-results je) (num-results-got je))))
+    (eql (num-results-expected je) (num-results-got je))))
 
 (defun append-result (je result)
   (with-job-executor-lock (je)
@@ -41,9 +41,9 @@
 
 (defun add-job (je callable)
   (with-job-executor-lock (je)
-    (incf (num-expected-results je))
+    (incf (num-results-expected je))
     (chanl:send (channel je) callable)
-    (num-expected-results je)))
+    (num-results-expected je)))
 
 (defun cleanup-threads (je)
   (dotimes (x (num-threads je))
